@@ -1,5 +1,6 @@
 package dev.vk.spring.genai.controller;
 
+import dev.vk.spring.genai.dto.OpenAiSummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -8,6 +9,7 @@ import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -95,6 +98,52 @@ public class OpenAiChatController {
         log.info("Result: {}", result);
         log.info(stopWatch.prettyPrint());
         return result;
+    }
+
+    @PostMapping("summary-template-dto-response")
+    private OpenAiSummaryResponse summaryTemplateWithDtoResponse(@RequestBody String content) {
+        log.info("User's prompt: {}", content);
+
+        stopWatch.start();
+        var response = openAiChatClient.prompt()
+                .user(promptUserSpec -> promptUserSpec.text("Summarize the {report}. Here is template:" +
+                        "* Summary" +
+                        "* Distribution by levels:" +
+                        "    - level 1" +
+                        "    - level 2" +
+                        "    - level 3" +
+                        "    - etc").param("report", content))
+                .call();
+        var result = response.content();
+        stopWatch.stop();
+
+        log.info("Result: {}", result);
+        log.info(stopWatch.prettyPrint());
+        return response.entity(OpenAiSummaryResponse.class);
+    }
+
+    @PostMapping("summary-template-dto-list-response")
+    private List<OpenAiSummaryResponse> summaryTemplateWithDtoListResponse(@RequestBody String content) {
+        log.info("User's prompt: {}", content);
+
+        stopWatch.start();
+        var response = openAiChatClient.prompt()
+                .user(promptUserSpec -> promptUserSpec.text("Summarize the {report}. " +
+                        "Return 3-5 possible outputs in the same format." +
+                        "Here is template:" +
+                        "* Summary" +
+                        "* Distribution by levels:" +
+                        "    - level 1" +
+                        "    - level 2" +
+                        "    - level 3" +
+                        "    - etc").param("report", content))
+                .call();
+        var result = response.content();
+        stopWatch.stop();
+
+        log.info("Result: {}", result);
+        log.info(stopWatch.prettyPrint());
+        return response.entity(new ParameterizedTypeReference<>() {});
     }
 
     @PostMapping(value = "prompt-stream")
