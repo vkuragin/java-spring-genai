@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public class OpenAiChatController {
     @Qualifier("openAiChatClient")
     private ChatClient openAiChatClient;
 
-    private StopWatch stopWatch = new StopWatch();
+    private final StopWatch stopWatch = new StopWatch();
 
     /**
      * Processes a user's prompt by sending it to an OpenAI chat client and returning the AI's response.
@@ -94,5 +95,20 @@ public class OpenAiChatController {
         log.info("Result: {}", result);
         log.info(stopWatch.prettyPrint());
         return result;
+    }
+
+    @PostMapping(value = "prompt-stream")
+    private Flux<String> promptStream(@RequestBody String content) {
+        log.info("User's prompt: {}", content);
+
+        stopWatch.start();
+        var response = openAiChatClient.prompt()
+                .system(SYSTEM_CONTEXT)
+                .user(content)
+                .stream();
+        stopWatch.stop();
+
+        log.info(stopWatch.prettyPrint());
+        return response.content();
     }
 }
