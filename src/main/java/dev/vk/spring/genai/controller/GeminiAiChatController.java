@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClientResponse;
-import org.springframework.ai.chat.metadata.ChatResponseMetadata;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.StopWatch;
@@ -13,8 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("chat/geminiai")
@@ -33,8 +29,6 @@ public class GeminiAiChatController {
 
     @PostMapping("prompt")
     private ChatClientResponse prompt(@RequestBody String content) {
-        log.info("User's prompt: {}", content);
-
         stopWatch.start();
         var response = chatClient.prompt()
                 .system(SYSTEM_CONTEXT)
@@ -42,7 +36,6 @@ public class GeminiAiChatController {
                 .call();
         stopWatch.stop();
 
-        log.info("Result: {}", response.chatClientResponse());
         log.info(stopWatch.prettyPrint());
         return response.chatClientResponse();
     }

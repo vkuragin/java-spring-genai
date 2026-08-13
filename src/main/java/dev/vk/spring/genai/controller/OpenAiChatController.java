@@ -43,8 +43,6 @@ public class OpenAiChatController {
      */
     @PostMapping("prompt")
     private String prompt(@RequestBody String content) {
-        log.info("User's prompt: {}", content);
-
         stopWatch.start();
         var response = openAiChatClient.prompt()
                 .system(SYSTEM_CONTEXT)
@@ -64,8 +62,6 @@ public class OpenAiChatController {
 
     @PostMapping("prompt2")
     private ChatClientResponse prompt2(@RequestBody String content) {
-        log.info("User's prompt2: {}", content);
-
         stopWatch.start();
         var response = openAiChatClient.prompt()
                 .system(SYSTEM_CONTEXT)
@@ -73,15 +69,12 @@ public class OpenAiChatController {
                 .call();
         stopWatch.stop();
 
-        log.info("Result: {}", response.chatClientResponse());
         log.info(stopWatch.prettyPrint());
         return response.chatClientResponse();
     }
 
     @PostMapping("summary-template")
     private String summaryTemplate(@RequestBody String content) {
-        log.info("User's prompt: {}", content);
-
         stopWatch.start();
         var response = openAiChatClient.prompt()
                 .user(promptUserSpec -> promptUserSpec.text("Summarize the {report}. Here is template:" +
@@ -95,15 +88,12 @@ public class OpenAiChatController {
         var result = response.content();
         stopWatch.stop();
 
-        log.info("Result: {}", result);
         log.info(stopWatch.prettyPrint());
         return result;
     }
 
     @PostMapping("summary-template-dto-response")
     private OpenAiSummaryResponse summaryTemplateWithDtoResponse(@RequestBody String content) {
-        log.info("User's prompt: {}", content);
-
         stopWatch.start();
         var response = openAiChatClient.prompt()
                 .user(promptUserSpec -> promptUserSpec.text("Summarize the {report}. Here is template:" +
@@ -117,15 +107,12 @@ public class OpenAiChatController {
         var result = response.content();
         stopWatch.stop();
 
-        log.info("Result: {}", result);
         log.info(stopWatch.prettyPrint());
         return response.entity(OpenAiSummaryResponse.class);
     }
 
     @PostMapping("summary-template-dto-list-response")
     private List<OpenAiSummaryResponse> summaryTemplateWithDtoListResponse(@RequestBody String content) {
-        log.info("User's prompt: {}", content);
-
         stopWatch.start();
         var response = openAiChatClient.prompt()
                 .user(promptUserSpec -> promptUserSpec.text("Summarize the {report}. " +
@@ -141,15 +128,12 @@ public class OpenAiChatController {
         var result = response.content();
         stopWatch.stop();
 
-        log.info("Result: {}", result);
         log.info(stopWatch.prettyPrint());
         return response.entity(new ParameterizedTypeReference<>() {});
     }
 
     @PostMapping(value = "prompt-stream")
     private Flux<String> promptStream(@RequestBody String content) {
-        log.info("User's prompt: {}", content);
-
         stopWatch.start();
         var response = openAiChatClient.prompt()
                 .system(SYSTEM_CONTEXT)

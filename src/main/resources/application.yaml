@@ -31,3 +31,4 @@ spring:
 logging:
   level:
     root: INFO
+    org.springframework.ai.chat.client.advisor: DEBUG

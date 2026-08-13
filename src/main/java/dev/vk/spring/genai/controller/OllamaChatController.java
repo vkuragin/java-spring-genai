@@ -29,8 +29,6 @@ public class OllamaChatController {
 
     @PostMapping("prompt")
     private ChatClientResponse prompt(@RequestBody String content) {
-        log.info("User's prompt: {}", content);
-
         stopWatch.start();
         var response = chatClient.prompt()
                 .system(SYSTEM_CONTEXT)
@@ -38,7 +36,6 @@ public class OllamaChatController {
                 .call();
         stopWatch.stop();
 
-        log.info("Result: {}", response.chatClientResponse());
         log.info(stopWatch.prettyPrint());
         return response.chatClientResponse();
     }
